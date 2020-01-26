@@ -159,6 +159,9 @@ func (Echo) Execute(input command.Input) {
 		fmt.Println("Data Will Write To VHD FIle.",writedata)
 		//55 AA 为intelCpu 识别引导区的魔数  如果不加如法加载
 		if moshu && nt == 0{
+			for len(writedata) != 512{
+				writedata= append(writedata, 0x00)
+			}
 			writedata[510]= 0x55
 			writedata[511]= 0xAA
 		}
