@@ -86,6 +86,7 @@ func (Echo) Configure() command.Configure {
 			Has: []command.ArgParam{
 				{Name: "view", Description: "是否拥有 view 字符串!"},
 				{Name: "vaild", Description: "引导分区自动添加识别数!"},
+				{Name: "e", Description: "写入结尾!"},
 			},
 			// 可选的参数，不输入也能执行
 			Option:   []command.ArgParam{
@@ -106,7 +107,7 @@ func (Echo) Execute(input command.Input) {
 	//fmt.Println("是否输入了 view ：",input.GetHas("view"))
 	datapath := input.GetOption("w")
 	isview := input.GetHas("view")
-
+	end := input.GetHas("e")
 	moshu := input.GetHas("vaild")
 
 	path := input.GetArgument("vhdfile")
@@ -156,12 +157,17 @@ func (Echo) Execute(input command.Input) {
 		}
 		nt, _ := strconv.Atoi(index)
 		writedata := ReadFile(datapath)
-		fmt.Println("Data Will Write To VHD FIle.",writedata)
+		if end == true{
+			writedata= append(writedata, 0x000a)
+		}
+		fmt.Println("Data Will Write To VHD FIle. ",writedata)
 		//55 AA 为intelCpu 识别引导区的魔数  如果不加如法加载
+
 		if moshu && nt == 0{
 			for len(writedata) != 512{
 				writedata= append(writedata, 0x00)
 			}
+
 			writedata[510]= 0x55
 			writedata[511]= 0xAA
 		}
